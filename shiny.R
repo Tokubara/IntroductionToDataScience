@@ -4,10 +4,11 @@ library(ggplot2)
 # ui=fluidPage("text") # div标签中, 有"text"
 server=function(input,output){ # 奇怪的语法部分原因就是因为server是一个函数, 函数就不需要有逗号了
   # output$hist=hist(rnorm(input$num)) # # 有bug, 不能直接使用, 一定需要放在一个reactive function中 需要套在render中才可以正常运行
-  nv=eventReactive(input$go, {list(nv=rnorm(input$num),title=input$title)}) # 这不行, 因为server中的每一行都必须在reactive函数中, reactive可以存很多
+  nv=eventReactive(input$go, {rnorm(input$num)}) # 这不行, 因为server中的每一行都必须在reactive函数中, reactive可以存很多
+  title=eventReactive(input$go, {input$title})
   # 可以把nv当做函数来记忆, 因此后面都是nv(), 但实际上可以是对象, 可以是R的任何对象, 比如list, 甚至是函数
   # 而且在ui中也得改
-  output$hist=renderPlot(hist(nv()$nv,main=nv()$title))
+  output$hist=renderPlot(hist(nv(),main=title()))
   # 但是括起来renderPlot是没用的, 相当于整个外面做了隔离, 但有什么影响呢, 它已经变了, 重新运行了
   # output$summary=renderPrint(summary(nv()))
   # observeEvent(input$go, {print( paste(as.integer(input$go), "sleep"))}) 
