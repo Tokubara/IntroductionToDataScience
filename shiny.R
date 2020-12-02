@@ -7,7 +7,8 @@ server=function(input,output){ # 奇怪的语法部分原因就是因为server�
   # nv=reactive() # 这不行, 因为server中的每一行都必须在reactive函数中, reactive可以存很多 
   # 可以把nv当做函数来记忆, 因此后面都是nv(), 但实际上可以是对象, 可以是R的任何对象, 比如list, 甚至是函数
   # 而且在ui中也得改
-  output$hist=renderPlot(hist(rnorm(input$num),main=input$title))
+  output$hist=renderPlot(hist(rnorm(input$num),main=isolate(input$title)))
+  # 但是括起来renderPlot是没用的, 相当于整个外面做了隔离, 但有什么影响呢, 它已经变了, 重新运行了
   # output$summary=renderPrint(summary(nv()))
 }
 
