@@ -8,16 +8,15 @@ server=function(input,output){ # 奇怪的语法部分原因就是因为server�
   # title=eventReactive(input$go, {input$title})
   # 可以把nv当做函数来记忆, 因此后面都是nv(), 但实际上可以是对象, 可以是R的任何对象, 比如list, 甚至是函数
   # 而且在ui中也得改
-  # rv=reactiveValues()
+  rv=reactiveValues()
   # 必须需要初始化
-  # rv$data=runif(100)
-  # observeEvent(input$unif, {rv$data=runif(100)
-  # rv$title="uniform distribution"})
-  # observeEvent(input$norm, {rv$data=rnorm(100)
-  # rv$title="normal distribution"})
-  dat=eventReactive(input$unif,runif(100))
-  dat=eventReactive(input$norm,rnorm(100))
-  output$hist=renderPlot(hist(dat()))
+  rv$data=runif(100)
+  observeEvent(input$unif, {rv$data=runif(100)
+  rv$title="uniform distribution"})
+  observeEvent(input$norm, {rv$data=rnorm(100)
+  rv$title="normal distribution"})
+  g=reactive(ggplot(data=data.frame(data=rv$data),aes(x=data))+geom_histogram()+labs(title="hist"))
+  output$hist=renderPlot(g())
   # 但是括起来renderPlot是没用的, 相当于整个外面做了隔离, 但有什么影响呢, 它已经变了, 重新运行了
   # output$summary=renderPrint(summary(nv()))
   # observeEvent(input$go, {print( paste(as.integer(input$go), "sleep"))}) 
@@ -54,5 +53,3 @@ shinyApp(ui=ui,server=server)
 
 # 以一种通知的过程, 啥意思, 它会通知reactive function, 因为reactive function是能监听的, 它就会在运行
 # 因此input$num并不是简单的数字, 它也是个通知器
-
-
