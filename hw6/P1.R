@@ -20,18 +20,24 @@ ui<-fluidPage(
 
 server<-function(input, output) {
   # 如何创建一个动态的函数变量?
-  dist_func <- reactiveValues(switch(input$dist,
+  all_reactives <- reactiveValues()
+  observe({
+    dist_func = switch(input$dist,
     norm = rnorm,
     uni = runif,
     exp = rexp
-    ))
-  output$plot <- renderPlot({
-    plot_func <- switch(input$plot_type,
-      hist = geom_histogram,
-      density = geom_density
     )
-    ggplot(data.frame(value = dist_func(input$num))) + aes(x = value) + plot_func(fill = "blue", alpha = 0.5, color="blue")
-    })
+    all_reactives$plot_func <- switch(input$plot_type,
+        hist = geom_histogram,
+        density = geom_density
+        )
+    all_reactives$data <- dist_func(input$num)
+  })
+  
+  
+  output$plot <- renderPlot({
+    ggplot(data.frame(value = all_reactives$data)) + aes(x = value) + all_reactives$plot_func(fill = "blue", alpha = 0.5, color = "blue")
+  })
 }
 
 shinyApp(ui=ui,server=server)
