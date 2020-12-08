@@ -20,17 +20,17 @@ ui<-fluidPage(
 
 server<-function(input, output) {
   # 如何创建一个动态的函数变量?
-  output$plot <- renderPlot({
-    dist_func <- switch(input$dist,
+  dist_func <- reactive(switch(input$dist,
     norm = rnorm,
     uni = runif,
     exp = rexp
-    )
+    ))
+  output$plot <- renderPlot({
     plot_func <- switch(input$plot_type,
       hist = geom_histogram,
       density = geom_density
     )
-    ggplot(data.frame(value = dist_func(input$num))) + aes(x = value) + plot_func(fill = "blue", alpha = 0.5, color="blue")
+    ggplot(data.frame(value = dist_func()(input$num))) + aes(x = value) + plot_func(fill = "blue", alpha = 0.5, color="blue")
     })
 }
 
